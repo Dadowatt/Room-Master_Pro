@@ -129,3 +129,85 @@ class Reservation:
             "disponibilites": disponibles,
         }
         
+
+    @classmethod
+    def supprimer_reservation(cls, reservation_id):
+        with get_cursor(dictionary=True) as curseur:
+            curseur.execute(
+                "SELECT id FROM reservations WHERE id = %s",
+                (reservation_id,)
+            )
+            if curseur.fetchone() is None:
+                raise ValueError("Réservation inexistante")
+
+            curseur.execute(
+                "DELETE FROM reservations WHERE id = %s",
+                (reservation_id,)
+            )
+
+        return f"Réservation {reservation_id} supprimée avec succès"
+    
+
+    @classmethod
+    def modifier_reservation(cls, reservation_id, date, motif, groupe_id, creneau_id):
+        #verifier que la reservation existe
+        with get_cursor(dictionary=True) as curseur:
+            curseur.execute(
+                "SELECT * FROM reservations WHERE id = %s",
+                (reservation_id,)
+            )
+            reservation = curseur.fetchone()
+
+        if reservation is None:
+            raise ValueError("Réservation inexistante")
+        
+        #verifier que le creneaux existe
+        with get_cursor(dictionary=True) as curseur:
+            curseur.execute(
+                "SELECT id FROM creneaux WHERE id = %s",
+                (creneau_id,)
+            )
+            if curseur.fetchone() is None:
+                raise ValueError("Créneau inexistant")
+            
+        #verifier que le groupe existe
+        with get_cursor(dictionary=True) as curseur:
+            curseur.execute(
+                "SELECT id FROM groupes WHERE id = %s",
+                (groupe_id,)
+            )
+            if curseur.fetchone() is None:
+                raise ValueError("Groupe inexistant")
+            
+        #verification du conflit    
+        with get_cursor(dictionary=True) as curseur:
+            curseur.execute(
+                """
+                SELECT COUNT(*) AS nb
+                FROM reservations
+                WHERE creneau_id = %s
+                AND date = %s
+                AND id != %s
+                """,
+                (creneau_id, date, reservation_id)
+            )
+            resultat = curseur.fetchone()
+
+        if resultat['nb'] > 0:
+            raise ValueError("Ce créneau est déjà réservé pour cette date")
+        
+
+        with get_cursor(dictionary=True) as curseur:
+            curseur.execute(
+                """
+                UPDATE reservations
+                SET date = %s,
+                    motif = %s,
+                    groupe_id = %s,
+                    creneau_id = %s
+                WHERE id = %s
+                """,
+                (date, motif, groupe_id, creneau_id, reservation_id)
+            )
+
+        return f"Réservation {reservation_id} modifiée avec succès."

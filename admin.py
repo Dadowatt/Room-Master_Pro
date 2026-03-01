@@ -46,12 +46,18 @@ class Admin:
                 "SELECT * FROM admins WHERE nom_utilisateur = %s",
                 (nom_utilisateur,)
             )
-            admin = curseur.fetchone()
-        if admin is None:
+            admin_data = curseur.fetchone()
+        if admin_data is None:
             raise ValueError("nom d'utilisateur incorrect")
-        if not bcrypt.checkpw(mot_de_passe_saisi.encode('utf-8'), admin['mot_de_passe'].encode('utf-8')):
-            raise ValueError("mot de passe incorrect")
         
-        return cls(admin['id'], admin['nom_utilisateur'], admin['email'], admin['mot_de_passe'])
+        admin = cls(
+            admin_data['id'],
+            admin_data['nom_utilisateur'],
+            admin_data['email'],
+            admin_data['mot_de_passe']
+        )
 
-        
+        if not admin.verifier_mot_de_passe(mot_de_passe_saisi):
+            raise ValueError("mot de passe incorrect")
+
+        return admin
