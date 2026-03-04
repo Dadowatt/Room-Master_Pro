@@ -6,6 +6,11 @@ from contextlib import contextmanager
 load_dotenv()
 
 def get_connection():
+    """
+    Crée et renvoie une connexion MySQL.
+    Les paramètres de connexion sont lus depuis les variables d'environnement :
+    DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME.
+    """
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),
         port=int(os.getenv("DB_PORT")),
@@ -14,6 +19,11 @@ def get_connection():
         database=os.getenv("DB_NAME"),
     )
 
+
+"""
+Fournit un curseur pour exécuter des requêtes SQL et gérer automatiquement la
+connexion et le commit dans le programme.
+"""
 @contextmanager
 def get_cursor(dictionary=False):
     conn = get_connection()

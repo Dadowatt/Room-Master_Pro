@@ -3,6 +3,9 @@ from admin import Admin
 import bcrypt
 
 class AdminRepo:
+    """Classe d'accès aux données pour les administrateurs.
+    Fournit des méthodes pour créer un administrateur et effectuer la connexion (login).
+    """
     @staticmethod
     def creer_admin(nom_utilisateur, email, mot_de_passe, mot_de_passe_confirmation):
         if mot_de_passe != mot_de_passe_confirmation:
