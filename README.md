@@ -39,6 +39,7 @@ Room-Master Pro est une application de gestion de salles et de réservations. El
   - Supprimer une réservation
   - Affichage du planning journalier
   - Export du planning en fichier CSV
+   un fichier Excel (.xlsx) est également généré automatiquement pour une visualisation plus pratique dans Excel.
 
 ---
 

@@ -20,6 +20,8 @@ def exporter_planning_csv(date, nom_fichier):
     La fonction récupère tous les créneaux et les réservations pour la date,
     puis écrit un fichier CSV listant chaque créneau avec son statut 
     ([LIBRE] ou [OCCUPÉ]) ainsi que le groupe, le motif et le responsable si occupé.
+    un fichier Excel (.xlsx) est également généré automatiquement
+    avec le même contenu, pour une visualisation plus pratique dans Excel.
     """
     creneaux = ReservationRepo.get_creneaux_et_reservations(date)
     
