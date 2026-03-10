@@ -55,8 +55,9 @@ CREATE TABLE `creneaux` (
   `heure_debut` time NOT NULL,
   `heure_fin` time NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `heure_debut` (`heure_debut`,`heure_fin`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `heure_debut` (`heure_debut`,`heure_fin`),
+  CONSTRAINT `check_heure` CHECK ((`heure_fin` > `heure_debut`))
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,7 +66,7 @@ CREATE TABLE `creneaux` (
 
 LOCK TABLES `creneaux` WRITE;
 /*!40000 ALTER TABLE `creneaux` DISABLE KEYS */;
-INSERT INTO `creneaux` VALUES (5,'08:00:00','10:00:00'),(6,'10:00:00','12:00:00'),(7,'12:00:00','14:00:00'),(8,'15:00:00','18:00:00'),(9,'18:00:00','21:00:00'),(10,'21:00:00','23:00:00');
+INSERT INTO `creneaux` VALUES (13,'08:00:00','10:00:00'),(14,'10:00:00','12:00:00'),(18,'12:00:00','14:00:00'),(12,'15:00:00','18:00:00'),(17,'21:00:00','23:00:00');
 /*!40000 ALTER TABLE `creneaux` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -84,7 +85,7 @@ CREATE TABLE `groupes` (
   `telephone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,7 +94,7 @@ CREATE TABLE `groupes` (
 
 LOCK TABLES `groupes` WRITE;
 /*!40000 ALTER TABLE `groupes` DISABLE KEYS */;
-INSERT INTO `groupes` VALUES (1,'Simplon','Fatima','simplon@gmail.com',''),(2,'Orange-academie','Cheikh','ck@gmail.com',''),(3,'Yellah','Farba','farba@gmail.com',''),(4,'Sorano','Awa','aw@gmail.com',''),(5,'Y\'en a marre','Kilifa','ynm@gmail.com',''),(6,'','','',''),(7,'56','56','565','');
+INSERT INTO `groupes` VALUES (1,'Simplon','Fatima','simplon@gmail.com',''),(2,'Orange-academie','Cheikh','ck@gmail.com',''),(3,'Yellah','Farba','farba@gmail.com',''),(4,'Sorano','Awa','aw@gmail.com',''),(5,'Y\'en a marre','Kilifa','ynm@gmail.com',''),(8,'Expresso','Abdou','abd@gmail.com','');
 /*!40000 ALTER TABLE `groupes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -112,11 +113,12 @@ CREATE TABLE `reservations` (
   `creneau_id` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `date` (`date`,`creneau_id`),
+  UNIQUE KEY `unique_reservation` (`date`,`creneau_id`),
   KEY `creneau_id` (`creneau_id`),
   KEY `groupe_id` (`groupe_id`),
   CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`creneau_id`) REFERENCES `creneaux` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`groupe_id`) REFERENCES `groupes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -125,7 +127,7 @@ CREATE TABLE `reservations` (
 
 LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
-INSERT INTO `reservations` VALUES (7,'2026-03-02','concert',4,10),(8,'2026-03-02','Bootcamp',2,7),(9,'2026-03-02','Anniversaire',4,9),(10,'2026-03-02','Conference de presse',3,8),(11,'2026-03-03','concert',4,6);
+INSERT INTO `reservations` VALUES (1,'2026-03-03','conference de presse',5,12),(16,'2026-03-03','Bootcamp',2,14),(17,'2026-03-10','concert',5,17),(20,'2026-03-10','Journée culturelle',3,14);
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -138,4 +140,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-03  0:13:32
+-- Dump completed on 2026-03-11  0:11:01
