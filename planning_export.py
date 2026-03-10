@@ -13,7 +13,6 @@ def format_heure(h):
     else:
         return str(h)[:5]
 
-
 def exporter_planning_csv(date, nom_fichier):
     """
     Exporte le planning d'une date donnée dans un fichier CSV.

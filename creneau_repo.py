@@ -26,49 +26,36 @@ class CreneauRepo:
 
     @staticmethod
     def creer_creneau(heure_debut, heure_fin):
-        from datetime import time, timedelta, datetime
+        from datetime import datetime, time
 
-        # Conversion des heures en objets time
+        # Vérification du format
         try:
             h_debut = datetime.strptime(heure_debut, "%H:%M").time()
             h_fin = datetime.strptime(heure_fin, "%H:%M").time()
         except ValueError:
             raise ValueError("Format invalide HH:MM")
 
-        # Vérifier que la fin est après le début
+        # Vérification que la fin est après le début
         if h_fin <= h_debut:
             raise ValueError("L'heure de fin doit être supérieure à l'heure de début")
 
-        # Vérifier que la fin ne dépasse pas 23:59
         if h_fin > time(23, 59):
-            raise ValueError("L'heure de fin ne peut pas dépasser 23:59 pour rester dans la même journée")
-
-        # Vérification des chevauchements avec les créneaux existants
-        creneaux_existants = CreneauRepo.lister_creneaux()
-        for c in creneaux_existants:
-            c_debut = c.heure_debut
-            c_fin = c.heure_fin
-
-            if isinstance(c_debut, timedelta):
-                total_seconds = c_debut.total_seconds()
-                c_debut = time(hour=int(total_seconds//3600), minute=int((total_seconds%3600)//60))
-            if isinstance(c_fin, timedelta):
-                total_seconds = c_fin.total_seconds()
-                c_fin = time(hour=int(total_seconds//3600), minute=int((total_seconds%3600)//60))
-
-            if isinstance(c_debut, str):
-                c_debut = datetime.strptime(c_debut, "%H:%M:%S").time()
-            if isinstance(c_fin, str):
-                c_fin = datetime.strptime(c_fin, "%H:%M:%S").time()
-
-            if h_debut < c_fin and h_fin > c_debut:
-                raise ValueError(f"Chevauchement avec le créneau existant {c.heure_debut} - {c.heure_fin}")
+            raise ValueError("L'heure de fin ne peut pas dépasser 23:59")
 
         with get_cursor(dictionary=True) as curseur:
+
+            # Vérification d chevauchement directement en SQL
+            curseur.execute("SELECT * FROM creneaux WHERE (%s < heure_fin) AND (%s > heure_debut)",
+                             (heure_debut, heure_fin))
+
+            if curseur.fetchone():
+                raise ValueError("Ce créneau chevauche un créneau existant")
+
             curseur.execute(
                 "INSERT INTO creneaux (heure_debut, heure_fin) VALUES (%s, %s)",
                 (heure_debut, heure_fin)
             )
+
             id_creneau = curseur.lastrowid
 
         return Creneau(id_creneau, heure_debut, heure_fin)

@@ -26,7 +26,7 @@ class Menu:
 
     def afficher_menu(self):
         while True:
-            print("\n--- MENU ADMIN ---")
+            print("\n=== MENU ADMIN ===")
             print("1. Lister les créneaux")
             print("2. Ajouter un créneau")
             print("3. Lister les groupes")
@@ -81,11 +81,13 @@ class Menu:
                     print("Option invalide")
 
 
-    def lister_creneaux(self):
+    def lister_creneaux(self, date=None):
         """Affiche tous les créneaux avec leur statut [LIBRE] ou [OCCUPÉ] pour une date donnée."""
-        print("\n--- Liste des créneaux ---")
-        date = input("Date (YYYY-MM-DD) (laisser vide = aujourd'hui) : ").strip()
-        if not date:
+        print("\n=== Liste des créneaux ===")
+        if date is None:
+            date = input("Date (YYYY-MM-DD) (laisser vide = aujourd'hui) : ").strip()
+
+        if date == "":
             date = datetime.today().strftime("%Y-%m-%d")
 
         creneaux = CreneauRepo.lister_creneaux()
@@ -100,7 +102,7 @@ class Menu:
 
     def ajouter_creneau(self):
         """Permet de créer un nouveau créneau horaire après saisie de l'heure de début et de fin."""
-        print("\n--- Ajouter un créneau ---")
+        print("\n=== Ajouter un créneau ===")
         heure_debut = input("Heure début (HH:MM) : ").strip()
         heure_fin = input("Heure fin (HH:MM) : ").strip()
         try:
@@ -127,7 +129,7 @@ class Menu:
 
     def ajouter_groupe(self):
         """Permet de créer un nouveau groupe après validation des champs."""
-        print("\n--- Ajouter un groupe ---")
+        print("\n=== Ajouter un groupe ===")
         while True:
             nom = input("Nom du groupe : ").strip()
             if not nom:
@@ -168,21 +170,21 @@ class Menu:
     def lister_groupes(self):
         """Affiche tous les groupes enregistrés avec leur responsable et email."""
         groupes = GroupeRepo.lister_groupes()
-        print("\n--- Liste des groupes ---")
+        print("\n=== Liste des groupes ===")
         for g in groupes:
-            print(f"{g.id} : {g.nom} - Responsable : {g.responsable} - Email : {g.email}")
+            print(f"{g.id} | Nom groupe: {g.nom} | Responsable : {g.responsable} | Email : {g.email}")
 
 
     def supprimer_groupe(self):
         """Supprime un groupe si celui-ci n'est pas utilisé dans une réservation."""
-        print("\n--- Supprimer un groupe ---")
+        print("\n=== Supprimer un groupe ===")
         groupes = GroupeRepo.lister_groupes()
         if not groupes:
             print("Aucun groupe disponible.")
             return
 
         for g in groupes:
-            print(f"{g.id} : {g.nom} - Responsable : {g.responsable} - Email : {g.email}")
+            print(f"{g.id} | Nom groupe: {g.nom} | Responsable : {g.responsable} | Email : {g.email}")
 
         try:
             groupe_id = int(input("ID du groupe à supprimer : "))
@@ -209,7 +211,7 @@ class Menu:
 
     def lister_reservations(self):
         """Affiche la liste des réservations avec date, motif, groupe et créneau."""
-        print("\n--- Liste des réservations ---")
+        print("\n=== Liste des réservations ===")
         with get_cursor(dictionary=True) as curseur:
             curseur.execute(
                 """SELECT r.id, r.date, r.motif, g.nom AS groupe, c.heure_debut, c.heure_fin
@@ -223,12 +225,12 @@ class Menu:
                 print("Aucune réservation trouvée.")
                 return
             for r in res:
-                print(f"{r['id']} : {r['date']} - {r['motif']} "
-                      f"(Groupe: {r['groupe']}, Créneau: {r['heure_debut']}-{r['heure_fin']})")
+                print(f"{r['id']} | Date: {r['date']} | Motif: {r['motif']} |"
+                      f"Groupe: {r['groupe']} | Créneau: {r['heure_debut']}-{r['heure_fin']}")
 
     def ajouter_reservation(self):
         """Crée une réservation en vérifiant la date, le motif, le groupe et le créneau."""
-        print("\n--- Ajouter une réservation ---")
+        print("\n=== Ajouter une réservation ===")
         date_str = input("Date (YYYY-MM-DD) : ").strip()
         try:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -243,7 +245,7 @@ class Menu:
         if not motif:
             print("Erreur : le motif ne peut pas être vide.")
             return
-        if not re.match(r"^[A-Za-z][A-Za-z0-9' \-]*$", motif):
+        if not motif.replace(" ", "").isalpha():
             print("Erreur : le motif contient des caractères non autorisés.")
             return
 
@@ -296,7 +298,7 @@ class Menu:
 
     def modifier_reservation(self):
         """Modifie une réservation existante après vérification de la disponibilité du créneau."""
-        print("\n--- Modifier une réservation ---")
+        print("\n=== Modifier une réservation ===")
 
         with get_cursor(dictionary=True) as curseur:
             curseur.execute(
@@ -309,10 +311,11 @@ class Menu:
             reservations = curseur.fetchall()
             if not reservations:
                 print("Aucune réservation trouvée.")
-                return
-            for r in reservations:
-                print(f"{r['id']} : {r['date']} - {r['motif']} "
-                    f"(Groupe: {r['groupe']}, Créneau: {r['heure_debut']}-{r['heure_fin']})")
+                return 
+
+        for r in reservations:
+            print(f"{r['id']} : {r['date']} - {r['motif']} "
+                f"(Groupe: {r['groupe']}, Créneau: {r['heure_debut']}-{r['heure_fin']})")
 
         try:
             r_id = int(input("ID de la réservation à modifier : "))
@@ -347,7 +350,7 @@ class Menu:
             return
 
         while True:
-            self.lister_creneaux()
+            self.lister_creneaux(date_str) 
             print("Vous pouvez choisir un créneau existant ou en créer un nouveau flexible.")
             choix = input("Voulez-vous créer un nouveau créneau ? (o/n) : ").lower().strip()
             if choix in ("o", "n"):
@@ -370,17 +373,16 @@ class Menu:
             except ValueError:
                 print("Erreur : L'ID du créneau doit être un nombre.")
                 return
-
-            try:
-                msg = ReservationRepo.modifier_reservation(r_id, date_str, motif, groupe_id, creneau_id)
-                print(msg)
-            except Exception as e:
-                print(f"Erreur : {e}")
+        try:
+            msg = ReservationRepo.modifier_reservation(r_id, date_str, motif, groupe_id, creneau_id)
+            print(msg)
+        except Exception as e:
+            print(f"Erreur : {e}")
 
 
     def supprimer_reservation(self):
         """Supprime une réservation existante."""
-        print("\n--- Supprimer une réservation ---")
+        print("\n=== Supprimer une réservation ===")
         self.lister_reservations()
         try:
             r_id = int(input("ID de la réservation à supprimer : "))
@@ -424,7 +426,7 @@ class Menu:
             )
             resultats = curseur.fetchall()
 
-        print(f"\n--- Planning du {date} ---")
+        print(f"\n=== Planning du {date} ===")
         for r in resultats:
             if r['nom'] is None:
                 print(f"{r['heure_debut']} - {r['heure_fin']} : [LIBRE]")
