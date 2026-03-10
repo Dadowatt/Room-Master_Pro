@@ -11,8 +11,7 @@ from planning_export import exporter_planning_csv
 import re
 
 class Menu:
-    class Menu:
-        """
+    """
         Classe qui gère l'interface du menu administratif.
         Chaque méthode correspond à une option du menu et interagit avec
         les repos AdminRepo, CreneauRepo, GroupeRepo, ReservationRepo, 
@@ -21,7 +20,7 @@ class Menu:
         - Lister, créer, modifier ou supprimer des réservations.
         - Afficher le planning journalier.
         - Exporter le planning en CSV.
-        """
+    """
     def __init__(self, admin):
         self.admin = admin
 

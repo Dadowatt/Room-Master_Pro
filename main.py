@@ -4,12 +4,12 @@ from db_connection import get_cursor
 
 def setup_initial_admin():
     """
-Point d'entrée du programme Room-Master Pro.
-Ce module gère :
-- la vérification et la création du premier compte admin si aucun n'existe,
-- la connexion d'un admin existant,
-- le lancement du menu principal pour gérer les créneaux, groupes et réservations.
-"""
+    Point d'entrée du programme Room-Master Pro.
+    Ce module gère :
+    - la vérification et la création du premier compte admin si aucun n'existe,
+    - la connexion d'un admin existant,
+    - le lancement du menu principal pour gérer les créneaux, groupes et réservations.
+    """
     with get_cursor(dictionary=True) as curseur:
         curseur.execute("SELECT COUNT(*) as nb FROM admins")
         resultat = curseur.fetchone()
