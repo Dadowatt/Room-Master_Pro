@@ -26,19 +26,25 @@ class CreneauRepo:
 
     @staticmethod
     def creer_creneau(heure_debut, heure_fin):
-        from datetime import time, timedelta
+        from datetime import time, timedelta, datetime
 
+        # Conversion des heures en objets time
         try:
             h_debut = datetime.strptime(heure_debut, "%H:%M").time()
             h_fin = datetime.strptime(heure_fin, "%H:%M").time()
         except ValueError:
             raise ValueError("Format invalide HH:MM")
 
+        # Vérifier que la fin est après le début
         if h_fin <= h_debut:
             raise ValueError("L'heure de fin doit être supérieure à l'heure de début")
 
-        creneaux_existants = CreneauRepo.lister_creneaux()
+        # Vérifier que la fin ne dépasse pas 23:59
+        if h_fin > time(23, 59):
+            raise ValueError("L'heure de fin ne peut pas dépasser 23:59 pour rester dans la même journée")
 
+        # Vérification des chevauchements avec les créneaux existants
+        creneaux_existants = CreneauRepo.lister_creneaux()
         for c in creneaux_existants:
             c_debut = c.heure_debut
             c_fin = c.heure_fin
@@ -66,6 +72,7 @@ class CreneauRepo:
             id_creneau = curseur.lastrowid
 
         return Creneau(id_creneau, heure_debut, heure_fin)
+
 
     @staticmethod
     def supprimer_creneau(creneau_id):
