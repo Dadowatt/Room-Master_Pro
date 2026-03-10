@@ -4,8 +4,7 @@ from mysql.connector import IntegrityError
 from datetime import datetime
 
 class ReservationRepo:
-    class ReservationRepo:
-        """
+    """
         Gère toutes les opérations liées aux réservations dans le programme.
         Fonctions principales :
         - Vérifier si un créneau est disponible pour une date donnée.
